@@ -1,10 +1,16 @@
 const express = require("express");
 const fs = require("fs");
+const serverless = require("serverless-http");
 const path = require("path");
 
 const app = express();
+const router = express.Router();
 
-app.get("/stream-mp3/:filename", (req, res) => {
+router.get("/check-status", (req, res) => {
+  res.json({"status": "Working"});
+})
+
+router.get("/stream-mp3/:filename", (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(
     __dirname,
@@ -51,6 +57,8 @@ app.get("/stream-mp3/:filename", (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
+app.use("/.netlify/functions/api", router);
+module.exports.handler = serverless(app);
+// app.listen(3000, () => {
+//   console.log("Server is running on port 3000");
+// });
